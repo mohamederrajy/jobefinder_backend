@@ -1,0 +1,637 @@
+cd /Users/aziz/Documents/jobfiner_backend
+
+# Initialize Node.js project if not already initialized
+npm init
+
+# Install the required dependencies
+npm install express mongoose bcryptjs jsonwebtoken dotenv express-validator cors multer
+
+# Install nodemon as a dev dependency
+npm install --save-dev nodemon
+
+# Run the server with nodemon
+nodemon server.js 
+
+curl -X POST http://localhost:5001/api/users/signup \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "user@jobfiner.com",
+  "password": "password123",
+  "zipCode": "12345"
+}' 
+
+# If you need sudo permissions
+sudo npm run dev
+
+# Or without sudo if you have the right permissions
+npm run dev 
+
+# On Mac/Linux - find the process using port 5000
+lsof -i :5000
+
+# Kill the process (replace PID with the process ID you found)
+kill -9 PID 
+
+# Generate a random string for JWT_SECRET
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))" 
+
+# Login Request
+curl -X POST http://localhost:5001/api/users/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "user@jobfiner.com",
+  "password": "password123"
+}' 
+
+# Create an admin user
+curl -X POST http://localhost:5001/api/users/signup \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "admin@example.com",
+  "password": "admin123",
+  "zipCode": "12345",
+  "role": "admin"
+}'
+
+# Create a new admin user
+curl -X POST http://localhost:5001/api/users/signup \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "superadmin@jobfiner.com",
+  "password": "admin123",
+  "zipCode": "12345",
+  "role": "admin"
+}'
+
+# Use the NEW token returned from the admin signup
+curl -X GET http://localhost:5001/api/admin/users \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiNzUwYWI4NDMwNTRiODUxNDY2MDRhIiwiZW1haWwiOiJhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUifSwiaWF0IjoxNzQwMDY2OTg3LCJleHAiOjE3NDAxNTMzODd9.byW4cni3b_x-c7xK1FffPV9ouxluY0LFFW0pwq4HAI8"
+
+curl -X POST http://localhost:5001/api/admin/users \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiNzUxNGNiNTk1YjIyNjI1NGU1ZDZkIiwiZW1haWwiOiJhZG1pbjNAam9iZmluZXIuY29tIiwiemlwQ29kZSI6IjEyMzQ1Iiwicm9sZSI6ImFkbWluIn0sImlhdCI6MTc0MDA2NzE0OSwiZXhwIjoxNzQwMTUzNTQ5fQ.F9ZiDS3zopooVn_Oivw4Jqrr2tO46lunfCN6j0We-kE" \
+-d '{
+  "email": "newuser@jobfiner.com",
+  "password": "password123",
+  "zipCode": "54321",
+  "role": "user"
+}' 
+
+curl -X POST http://localhost:5001/api/admin/users \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiNzUxNGNiNTk1YjIyNjI1NGU1ZDZkIiwiZW1haWwiOiJhZG1pbjNAam9iZmluZXIuY29tIiwiemlwQ29kZSI6IjEyMzQ1Iiwicm9sZSI6ImFkbWluIn0sImlhdCI6MTc0MDA2NzE0OSwiZXhwIjoxNzQwMTUzNTQ5fQ.F9ZiDS3zopooVn_Oivw4Jqrr2tO46lunfCN6j0We-kE" \
+-d '{
+  "email": "newuser2@jobfiner.com",
+  "password": "password123",
+  "zipCode": "54321",
+  "role": "user"
+}' 
+
+curl -X PUT http://localhost:5001/api/admin/users/67b74ffe29258a402bf47da2 \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiNzUxNGNiNTk1YjIyNjI1NGU1ZDZkIiwiZW1haWwiOiJhZG1pbjNAam9iZmluZXIuY29tIiwiemlwQ29kZSI6IjEyMzQ1Iiwicm9sZSI6ImFkbWluIn0sImlhdCI6MTc0MDA2NzE0OSwiZXhwIjoxNzQwMTUzNTQ5fQ.F9ZiDS3zopooVn_Oivw4Jqrr2tO46lunfCN6j0We-kE" \
+-d '{
+  "zipCode": "99999",
+  "role": "user"
+}' 
+
+curl -X POST http://localhost:5001/api/admin/users \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiNzUxNGNiNTk1YjIyNjI1NGU1ZDZkIiwiZW1haWwiOiJhZG1pbjNAam9iZmluZXIuY29tIiwiemlwQ29kZSI6IjEyMzQ1Iiwicm9sZSI6ImFkbWluIn0sImlhdCI6MTc0MDA2NzE0OSwiZXhwIjoxNzQwMTUzNTQ5fQ.F9ZiDS3zopooVn_Oivw4Jqrr2tO46lunfCN6j0We-kE" \
+-d '{
+  "email": "newuser3@jobfiner.com",
+  "password": "password123",
+  "zipCode": "54321",
+  "role": "user"
+}' 
+
+curl -X DELETE http://localhost:5001/api/admin/users/67b75114c71f0000813c3d05 \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiNzUxNGNiNTk1YjIyNjI1NGU1ZDZkIiwiZW1haWwiOiJhZG1pbjNAam9iZmluZXIuY29tIiwiemlwQ29kZSI6IjEyMzQ1Iiwicm9sZSI6ImFkbWluIn0sImlhdCI6MTc0MDA2NzE0OSwiZXhwIjoxNzQwMTUzNTQ5fQ.F9ZiDS3zopooVn_Oivw4Jqrr2tO46lunfCN6j0We-kE" 
+
+curl -X GET http://localhost:5001/api/jobs \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4"
+
+curl -X POST http://localhost:5001/api/jobs \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4" \
+-d '{
+  "title": "Software Developer",
+  "company": "Tech Company",
+  "hourlyRate": 45,
+  "address": {
+    "street": "123 Tech St",
+    "city": "San Francisco",
+    "state": "CA",
+    "zipCode": "94105"
+  },
+  "tags": ["javascript", "react", "node"],
+  "isUrgent": true
+}' 
+
+# Admin Login Request
+curl -X POST http://localhost:5001/api/users/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "admin3@jobfiner.com",
+  "password": "admin123"
+}' 
+
+# First, login to get a fresh token
+curl -X POST http://localhost:5001/api/users/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "admin@jobfiner.com",
+  "password": "admin123"
+}'
+
+# Then use the token to get statistics
+curl -X GET http://localhost:5001/api/admin/statistics \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4" 
+
+# First, create a new admin user
+curl -X POST http://localhost:5001/api/users/signup \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "admin2024@jobfiner.com",
+  "password": "admin123",
+  "zipCode": "12345",
+  "role": "admin"
+}' 
+
+# Get statistics with the new admin token
+curl -X GET http://localhost:5001/api/admin/statistics \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiYTAwZDBiNmE5ZDk3ZjRmZWU5YmU4IiwiZW1haWwiOiJhZG1pbjIwMjRAam9iZmluZXIuY29tIiwiemlwQ29kZSI6IjEyMzQ1Iiwicm9sZSI6ImFkbWluIn0sImlhdCI6MTc0MDI0MzE1MiwiZXhwIjoxNzQwMzI5NTUyfQ.jGqI3Wv3O3IEi4J7Ta4gb7AV7odUCIQVSgQQBm3-WdU" 
+
+# First login as admin
+curl -X POST http://localhost:5001/api/users/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "admin2024@jobfiner.com",
+  "password": "admin123"
+}'
+
+# Create a new job with about field
+curl -X POST http://localhost:5001/api/jobs \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4" \
+-d '{
+  "title": "Senior Software Engineer",
+  "company": "Tech Corp",
+  "logo": "https://example.com/tech-corp-logo.png",
+  "about": "We are looking for an experienced software engineer to join our team. The ideal candidate will have strong experience with React, Node.js, and cloud technologies. You will be responsible for designing and implementing new features, maintaining existing systems, and mentoring junior developers.",
+  "hourlyRate": 75,
+  "address": {
+    "street": "123 Tech Street",
+    "city": "San Francisco",
+    "state": "CA",
+    "zipCode": "94105"
+  },
+  "tags": ["software", "engineering", "senior", "full-stack"],
+  "isUrgent": true
+}' 
+
+# Create a retail job
+curl -X POST http://localhost:5001/api/jobs \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiYTAwZDBiNmE5ZDk3ZjRmZWU5YmU4IiwiZW1haWwiOiJhZG1pbjIwMjRAam9iZmluZXIuY29tIiwiemlwQ29kZSI6IjEyMzQ1Iiwicm9sZSI6ImFkbWluIn0sImlhdCI6MTc0MDI0MzE1MiwiZXhwIjoxNzQwMzI5NTUyfQ.jGqI3Wv3O3IEi4J7Ta4gb7AV7odUCIQVSgQQBm3-WdU" \
+-d '{
+  "title": "Retail Sales Associate",
+  "company": "Fashion Store",
+  "hourlyRate": 18,
+  "address": {
+    "street": "456 Mall Road",
+    "city": "Virginia Beach",
+    "state": "VA",
+    "zipCode": "23462"
+  },
+  "tags": ["retail", "sales", "customer-service"],
+  "isUrgent": false
+}'
+
+# Create a restaurant job
+curl -X POST http://localhost:5001/api/jobs \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiYTAwZDBiNmE5ZDk3ZjRmZWU5YmU4IiwiZW1haWwiOiJhZG1pbjIwMjRAam9iZmluZXIuY29tIiwiemlwQ29kZSI6IjEyMzQ1Iiwicm9sZSI6ImFkbWluIn0sImlhdCI6MTc0MDI0MzE1MiwiZXhwIjoxNzQwMzI5NTUyfQ.jGqI3Wv3O3IEi4J7Ta4gb7AV7odUCIQVSgQQBm3-WdU" \
+-d '{
+  "title": "Line Cook",
+  "company": "Gourmet Restaurant",
+  "hourlyRate": 22,
+  "address": {
+    "street": "789 Food Court",
+    "city": "Norfolk",
+    "state": "VA",
+    "zipCode": "23510"
+  },
+  "tags": ["restaurant", "cooking", "food-service"],
+  "isUrgent": true
+}' 
+
+curl -X POST http://localhost:5003/api/users/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "admin2024@jobfiner.com",
+  "password": "admin123"
+}' 
+
+# Stop any existing processes
+killall node
+
+# Start server with port 5001
+nodemon server.js 
+
+# Update a job
+curl -X PUT http://localhost:5003/api/jobs/YOUR_JOB_ID \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_ADMIN_TOKEN" \
+-d '{
+  "title": "Updated Software Engineer",
+  "hourlyRate": 85,
+  "isUrgent": false
+}'
+
+# First get all jobs to find the job ID
+curl -X GET http://localhost:5001/api/jobs \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4"
+
+# Then delete using the actual job ID
+curl -X DELETE http://localhost:5001/api/jobs/JOB_ID \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4"
+
+# On Mac/Linux
+lsof -i :5003
+
+# Or
+ps aux | grep node 
+
+# If you know the PID (process ID)
+kill -9 PID
+
+# Or on Mac, kill all Node processes
+killall node
+
+# Try with sudo
+sudo killall node
+
+# Then try to start your server again
+nodemon server.js 
+
+# Find process using port 5003
+lsof -i :5003 
+
+# Kill the process (replace 1234 with the actual PID you found)
+kill -9 1234 
+
+# Find and kill any process on port 5003 (sudo might be required)
+sudo lsof -i :5003
+sudo kill -9 $(sudo lsof -t -i:5003) 
+
+# Check all processes using port 5003 with sudo
+sudo lsof -i :5003
+
+# Force kill anything on port 5003
+sudo kill -9 $(sudo lsof -t -i:5003)
+
+# Start server again
+nodemon server.js 
+
+# Test login
+curl -X POST http://localhost:5001/api/users/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "admin2024@jobfiner.com",
+  "password": "admin123"
+}' 
+
+# Test the correct login endpoint
+curl -X POST http://localhost:5001/api/users/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "admin2024@jobfiner.com",
+  "password": "admin123"
+}' 
+
+# Regular user signup
+curl -X POST http://localhost:5001/api/users/signup \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "newuser@jobfiner.com",
+  "password": "password123",
+  "zipCode": "12345"
+}'
+
+# Admin signup
+curl -X POST http://localhost:5001/api/users/signup \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "admin@jobfiner.com",
+  "password": "admin123",
+  "zipCode": "12345",
+  "role": "admin"
+}' 
+
+# Get all jobs with full details
+curl -X GET http://localhost:5001/api/jobs \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4"
+
+# With filters
+curl -X GET "http://localhost:5001/api/jobs?city=San%20Francisco&minHourlyRate=50&tags=react,node&isUrgent=true" \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4"
+
+# Get filtered jobs (examples)
+# By city
+curl -X GET "http://localhost:5001/api/jobs?city=San%20Francisco" \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4"
+
+# By salary range
+curl -X GET "http://localhost:5001/api/jobs?minHourlyRate=30&maxHourlyRate=100" \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4"
+
+# By tags
+curl -X GET "http://localhost:5001/api/jobs?tags=software,engineering" \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4"
+
+# Urgent jobs only
+curl -X GET "http://localhost:5001/api/jobs?isUrgent=true" \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4"
+
+# First login to get token
+curl -X POST http://localhost:5001/api/users/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "admin2024@jobfiner.com",
+  "password": "admin123"
+}'
+
+# Then update subscription status using the token
+curl -X POST http://localhost:5001/api/users/subscribe \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_TOKEN" \
+-d '{
+  "plan": "premium",
+  "months": 1
+}'
+
+# Check subscription status
+curl -X GET http://localhost:5001/api/users/subscription \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_TOKEN" 
+
+# Try to access full job details
+curl -X GET http://localhost:5001/api/jobs \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_USER_TOKEN"
+
+# Get preview (always returns 4 jobs)
+curl -X GET http://localhost:5001/api/jobs/preview
+
+# OR with explicit limit
+curl -X GET "http://localhost:5001/api/jobs/preview?limit=10"
+
+# Get preview with 20 jobs
+curl -X GET "http://localhost:5001/api/jobs/preview?limit=20" 
+
+# Then check subscription status using the token from login response
+curl -X GET http://localhost:5001/api/users/subscription \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_LOGIN_TOKEN" 
+
+# Create new admin user
+curl -X POST http://localhost:5001/api/users/signup \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "newadmin@jobfiner.com",
+  "password": "admin123",
+  "zipCode": "12345",
+  "role": "admin"
+}' 
+
+# Login as admin
+curl -X POST http://localhost:5001/api/users/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "newadmin@jobfiner.com",
+  "password": "admin123"
+}' 
+
+# Get statistics with admin token
+curl -X GET http://localhost:5001/api/admin/statistics \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4" 
+
+# First get all jobs to find the job ID
+curl -X GET http://localhost:5001/api/jobs \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4"
+
+# Then update a specific job (replace JOB_ID with actual ID)
+curl -X PUT http://localhost:5001/api/jobs/JOB_ID \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4" \
+-d '{
+  "title": "Updated Software Engineer",
+  "company": "Updated Tech Corp",
+  "hourlyRate": 85,
+  "address": {
+    "street": "456 Tech Ave",
+    "city": "San Francisco",
+    "state": "CA",
+    "zipCode": "94105"
+  },
+  "tags": ["senior", "fullstack", "react", "node"],
+  "isUrgent": true
+}' 
+
+# Update just the hourly rate and urgency
+curl -X PUT http://localhost:5001/api/jobs/JOB_ID \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4" \
+-d '{
+  "hourlyRate": 90,
+  "isUrgent": false
+}' 
+
+# First get all jobs to find an ID
+curl -X GET http://localhost:5001/api/jobs/preview
+
+# Then get specific job by ID (replace JOB_ID with actual ID)
+curl -X GET http://localhost:5001/api/jobs/JOB_ID \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4" 
+
+# Create a job with logo
+curl -X POST http://localhost:5001/api/jobs \
+-H "x-auth-token: YOUR_ADMIN_TOKEN" \
+-F "logo=@./test-logo.png" \
+-F 'jobData={
+  "title": "Frontend Developer",
+  "company": "Web Corp",
+  "about": "Looking for a frontend developer...",
+  "hourlyRate": 55,
+  "address": {
+    "street": "123 Web St",
+    "city": "San Francisco",
+    "state": "CA",
+    "zipCode": "94105"
+  },
+  "tags": ["frontend", "react", "javascript"],
+  "isUrgent": true
+}'
+
+# Test accessing the image directly
+curl -X GET http://localhost:5001/uploads/logos/FILENAME.png 
+
+# List files in uploads directory
+ls -l uploads/logos/ 
+
+# Get the image URL from the job response and try to access it
+curl -I http://localhost:5001/uploads/logos/FILENAME.png 
+
+# Get specific job details
+curl -X GET http://localhost:5001/api/jobs/JOB_ID \
+-H "Content-Type: application/json" \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4" 
+
+# First subscribe to get access (if not admin)
+curl -X POST http://localhost:5001/api/users/subscribe \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_TOKEN" \
+-d '{
+  "plan": "premium",
+  "months": 1
+}'
+
+# Then get full job details
+curl -X GET http://localhost:5001/api/jobs \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_TOKEN"
+
+# With filters (for paid users/admin)
+curl -X GET "http://localhost:5001/api/jobs?city=San%20Francisco&tags=react,node" \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_TOKEN" 
+
+# 1. Get job without token (non-subscriber)
+curl -X GET http://localhost:5001/api/jobs/JOB_ID
+
+# Response for non-subscribers:
+{
+  "_id": "job_id",
+  "title": "Frontend Developer",
+  "company": "Web Corp",
+  "logo": "http://localhost:5001/uploads/logos/1234567890-logo.png",
+  "about": "Full job description...", // Full description
+  "hourlyRate": 55,
+  "address": {
+    "city": "San Francisco"  // Only city, no full address
+  },
+  "tags": ["frontend", "react", "javascript"],
+  "isUrgent": true,
+  "createdAt": "2024-03-22T..."
+}
+
+# 2. Get job with admin/subscriber token
+curl -X GET http://localhost:5001/api/jobs/JOB_ID \
+-H "x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjdiZTI3NzlhZTBkMDEwZDk5NDViM2JmIiwiZW1haWwiOiJuZXdhZG1pbkBqb2JmaW5lci5jb20iLCJ6aXBDb2RlIjoiMTIzNDUiLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNzQwNTE2MDI2LCJleHAiOjE3NDA2MDI0MjZ9.b2oMO-E4ruBOLCn0ZbnSWG7k2k77yp6hfKx41BAl6R4"
+
+# Response for admin/subscribers:
+{
+  "_id": "job_id",
+  "title": "Frontend Developer",
+  "company": "Web Corp",
+  "logo": "http://localhost:5001/uploads/logos/1234567890-logo.png",
+  "about": "Full job description...",
+  "hourlyRate": 55,
+  "address": {
+    "street": "123 Web St",    // Full address
+    "city": "San Francisco",
+    "state": "CA",
+    "zipCode": "94105"
+  },
+  "tags": ["frontend", "react", "javascript"],
+  "isUrgent": true,
+  "createdAt": "2024-03-22T...",
+  "createdBy": {              // Additional info
+    "email": "admin@jobfiner.com"
+  }
+} 
+
+# 1. First login to get a fresh token
+curl -X POST http://localhost:5001/api/users/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "user@jobfiner.com",
+  "password": "password123"
+}'
+
+# 2. Verify the job exists
+curl -X GET http://localhost:5001/api/jobs/67c2f74fce8dcd4c4e99d1c0 \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_TOKEN_FROM_LOGIN"
+
+# 3. Try to save the job
+curl -X POST http://localhost:5001/api/users/saved-jobs/67c2f74fce8dcd4c4e99d1c0 \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_TOKEN_FROM_LOGIN" 
+
+# Login first
+curl -X POST http://localhost:5001/api/users/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "contac.90000@gmail.com",
+  "password": "your_password"
+}'
+
+# Then try to save the job again
+curl -X POST http://localhost:5001/api/users/saved-jobs/67c2f74fce8dcd4c4e99d1c0 \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_TOKEN_FROM_LOGIN" 
+
+# Get current settings
+curl -X GET http://localhost:5001/api/admin/settings \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_ADMIN_TOKEN"
+
+# Update preview limit (e.g., to show 6 jobs)
+curl -X PUT http://localhost:5001/api/admin/settings/preview-limit \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_ADMIN_TOKEN" \
+-d '{
+  "limit": 6
+}'
+
+# Test the preview endpoint with new limit
+curl -X GET http://localhost:5001/api/jobs/preview 
+
+# First get all jobs to see their IDs
+curl -X GET http://localhost:5001/api/jobs \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_ADMIN_TOKEN"
+
+# Update preview jobs with specific job IDs
+curl -X PUT http://localhost:5001/api/admin/settings/preview-jobs \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_ADMIN_TOKEN" \
+-d '{
+  "jobIds": ["job_id_1", "job_id_2", "job_id_3", "job_id_4"]
+}'
+
+# Get current settings to verify
+curl -X GET http://localhost:5001/api/admin/settings \
+-H "Content-Type: application/json" \
+-H "x-auth-token: YOUR_ADMIN_TOKEN"
+
+# Test the preview endpoint
+curl -X GET http://localhost:5001/api/jobs/preview 
