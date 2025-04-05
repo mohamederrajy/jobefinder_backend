@@ -311,4 +311,167 @@ router.get('/saved-jobs', auth, async (req, res) => {
   }
 });
 
+// Get current user profile
+router.get('/me', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Update user profile
+router.put('/profile', auth, async (req, res) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      professionalTitle,
+      location,
+      phoneNumber,
+      professionalSummary,
+      skills,
+      experience,
+      education
+    } = req.body;
+
+    // Build profile object
+    const profileFields = {};
+    if (firstName) profileFields.firstName = firstName;
+    if (lastName) profileFields.lastName = lastName;
+    if (professionalTitle) profileFields.professionalTitle = professionalTitle;
+    if (location) profileFields.location = location;
+    if (phoneNumber) profileFields.phoneNumber = phoneNumber;
+    if (professionalSummary) profileFields.professionalSummary = professionalSummary;
+    if (skills) {
+      profileFields.skills = Array.isArray(skills) 
+        ? skills 
+        : skills.split(',').map(skill => skill.trim());
+    }
+
+    // Update user profile
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: { profile: profileFields } },
+      { new: true }
+    ).select('-password');
+
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Add experience to profile
+router.put('/profile/experience', auth, async (req, res) => {
+  try {
+    const {
+      title,
+      company,
+      location,
+      from,
+      to,
+      current,
+      description
+    } = req.body;
+
+    const newExp = {
+      title,
+      company,
+      location,
+      from,
+      to,
+      current,
+      description
+    };
+
+    // Add to experience array
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $push: { 'profile.experience': newExp } },
+      { new: true }
+    ).select('-password');
+
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Delete experience from profile
+router.delete('/profile/experience/:exp_id', auth, async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $pull: { 'profile.experience': { _id: req.params.exp_id } } },
+      { new: true }
+    ).select('-password');
+
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Add education to profile
+router.put('/profile/education', auth, async (req, res) => {
+  try {
+    const {
+      school,
+      degree,
+      fieldOfStudy,
+      from,
+      to,
+      current,
+      description
+    } = req.body;
+
+    const newEdu = {
+      school,
+      degree,
+      fieldOfStudy,
+      from,
+      to,
+      current,
+      description
+    };
+
+    // Add to education array
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $push: { 'profile.education': newEdu } },
+      { new: true }
+    ).select('-password');
+
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Delete education from profile
+router.delete('/profile/education/:edu_id', auth, async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $pull: { 'profile.education': { _id: req.params.edu_id } } },
+      { new: true }
+    ).select('-password');
+
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 module.exports = router; 

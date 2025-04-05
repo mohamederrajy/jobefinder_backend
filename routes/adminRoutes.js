@@ -352,4 +352,59 @@ router.get('/users/:userId', [auth, isAdmin], async (req, res) => {
   }
 });
 
+// Get Stripe settings - Admin only
+router.get('/stripe-settings', [auth, isAdmin], async (req, res) => {
+  try {
+    const settings = await Settings.findOne();
+    
+    // Return the settings from database, not from process.env
+    res.json({
+      stripeSecretKey: settings?.stripeSettings?.secretKey || '',
+      stripePublishableKey: settings?.stripeSettings?.publishableKey || '',
+      stripeWebhookSecret: settings?.stripeSettings?.webhookSecret || '',
+      stripePriceId: settings?.stripeSettings?.priceId || ''
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching Stripe settings' });
+  }
+});
+
+// Update Stripe settings - Admin only
+router.put('/stripe-settings', [auth, isAdmin], async (req, res) => {
+  try {
+    const {
+      stripeSecretKey,
+      stripePublishableKey,
+      stripeWebhookSecret,
+      stripePriceId
+    } = req.body;
+
+    // Update environment variables in database
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = new Settings();
+    }
+
+    settings.stripeSettings = {
+      secretKey: stripeSecretKey,
+      publishableKey: stripePublishableKey,
+      webhookSecret: stripeWebhookSecret,
+      priceId: stripePriceId,
+      updatedAt: new Date()
+    };
+
+    await settings.save();
+
+    // Note: The actual environment variables won't change until server restart
+    // You'll need to implement a way to reload these or restart the server
+
+    res.json({ 
+      message: 'Stripe settings updated successfully',
+      note: 'Server restart may be required for changes to take effect'
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating Stripe settings' });
+  }
+});
+
 module.exports = router; 

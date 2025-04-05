@@ -50,17 +50,24 @@ const checkSubscription = async (req, res, next) => {
   }
 };
 
-// Create job with logo upload - Admin only
-router.post('/', [auth, isAdmin, upload.single('logo')], async (req, res) => {
+// Create job with logo and demo image upload - Admin only
+router.post('/', [auth, isAdmin, upload.fields([
+  { name: 'logo', maxCount: 1 },
+  { name: 'demoImage', maxCount: 1 }
+])], async (req, res) => {
   try {
     const jobData = JSON.parse(req.body.jobData);
     
     // Add logo path if file was uploaded
-    if (req.file) {
-      // Store the complete URL
+    if (req.files.logo) {
       const baseUrl = `${req.protocol}://${req.get('host')}`;
-      jobData.logo = `${baseUrl}/uploads/logos/${req.file.filename}`;
-      console.log('Stored logo path:', jobData.logo); // Debug log
+      jobData.logo = `${baseUrl}/uploads/logos/${req.files.logo[0].filename}`;
+    }
+
+    // Add demo image path if file was uploaded
+    if (req.files.demoImage) {
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      jobData.imageUrl = `${baseUrl}/uploads/demos/${req.files.demoImage[0].filename}`;
     }
 
     const job = new Job({
@@ -71,9 +78,13 @@ router.post('/', [auth, isAdmin, upload.single('logo')], async (req, res) => {
     await job.save();
     res.json(job);
   } catch (err) {
-    // Delete uploaded file if job creation fails
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
+    // Delete uploaded files if job creation fails
+    if (req.files) {
+      Object.values(req.files).forEach(fileArray => {
+        fileArray.forEach(file => {
+          fs.unlinkSync(file.path);
+        });
+      });
     }
     console.error(err.message);
     res.status(500).send('Server error');
@@ -87,21 +98,61 @@ router.get('/preview', async (req, res) => {
     const settings = await Settings.findOne()
       .populate({
         path: 'previewJobs',
-        select: 'title company logo address.city hourlyRate tags isUrgent about'
+        select: 'title company logo imageUrl address hourlyRate tags isUrgent about jobUrl contactDetails createdAt'
       });
 
-    // If no settings or no preview jobs selected, return most recent jobs
+    let previewJobs;
+
+    // If no settings or no preview jobs selected, get most recent jobs
     if (!settings || !settings.previewJobs.length) {
-      const defaultJobs = await Job.find()
-        .select('title company logo address.city hourlyRate tags isUrgent about')
+      previewJobs = await Job.find()
+        .select('title company logo imageUrl address hourlyRate tags isUrgent about jobUrl contactDetails createdAt')
         .sort({ createdAt: -1 })
         .limit(4);
-
-      return res.json(defaultJobs);
+    } else {
+      previewJobs = settings.previewJobs;
     }
 
-    // Return admin-selected preview jobs
-    res.json(settings.previewJobs);
+    // Transform the response to show full details only for first job
+    const transformedJobs = previewJobs.map((job, index) => {
+      if (index === 0) {
+        // First job - return all details
+        return {
+          _id: job._id,
+          title: job.title,
+          company: job.company,
+          logo: job.logo,
+          imageUrl: job.imageUrl,
+          about: job.about,
+          hourlyRate: job.hourlyRate,
+          address: job.address, // Full address
+          tags: job.tags,
+          isUrgent: job.isUrgent,
+          jobUrl: job.jobUrl,
+          contactDetails: job.contactDetails,
+          createdAt: job.createdAt
+        };
+      } else {
+        // Other jobs - limited details
+        return {
+          _id: job._id,
+          title: job.title,
+          company: job.company,
+          logo: job.logo,
+          imageUrl: job.imageUrl,
+          about: job.about,
+          hourlyRate: job.hourlyRate,
+          address: {
+            city: job.address.city
+          },
+          tags: job.tags,
+          isUrgent: job.isUrgent,
+          createdAt: job.createdAt
+        };
+      }
+    });
+
+    res.json(transformedJobs);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
@@ -153,6 +204,18 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Job not found' });
     }
 
+    // Check if this job is the first preview job
+    const settings = await Settings.findOne()
+      .populate('previewJobs', '_id');
+    
+    const isFirstPreviewJob = settings?.previewJobs?.length > 0 && 
+      settings.previewJobs[0]._id.toString() === job._id.toString();
+
+    // If it's the first preview job, return full details
+    if (isFirstPreviewJob) {
+      return res.json(job);
+    }
+
     // Check if user is authenticated and has subscription
     const token = req.header('x-auth-token');
     if (token) {
@@ -177,7 +240,8 @@ router.get('/:id', async (req, res) => {
       title: job.title,
       company: job.company,
       logo: job.logo,
-      about: job.about,  // Full description
+      imageUrl: job.imageUrl,
+      about: job.about,
       hourlyRate: job.hourlyRate,
       address: {
         city: job.address.city
@@ -185,7 +249,6 @@ router.get('/:id', async (req, res) => {
       tags: job.tags,
       isUrgent: job.isUrgent,
       createdAt: job.createdAt
-      // Note: jobUrl and contactDetails are excluded for non-subscribers
     };
 
     res.json(limitedJob);
@@ -198,23 +261,30 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Update job with logo - Admin only
-router.put('/:id', [auth, isAdmin, upload.single('logo')], async (req, res) => {
+// Update job - Admin only
+router.put('/:id', [auth, isAdmin, upload.fields([
+  { name: 'logo', maxCount: 1 },
+  { name: 'demoImage', maxCount: 1 }
+])], async (req, res) => {
   try {
-    const jobData = JSON.parse(req.body.jobData);
+    let jobData;
     
-    // Add logo path if new file was uploaded
-    if (req.file) {
-      jobData.logo = `/uploads/logos/${req.file.filename}`;
+    if (req.files && (req.files.logo || req.files.demoImage)) {
+      jobData = JSON.parse(req.body.jobData || '{}');
       
-      // Delete old logo if exists
-      const oldJob = await Job.findById(req.params.id);
-      if (oldJob.logo) {
-        const oldPath = path.join(__dirname, '..', oldJob.logo);
-        if (fs.existsSync(oldPath)) {
-          fs.unlinkSync(oldPath);
-        }
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      
+      // Add logo path if new logo was uploaded
+      if (req.files.logo) {
+        jobData.logo = `${baseUrl}/uploads/logos/${req.files.logo[0].filename}`;
       }
+      
+      // Add demo image path if new demo image was uploaded
+      if (req.files.demoImage) {
+        jobData.imageUrl = `${baseUrl}/uploads/demos/${req.files.demoImage[0].filename}`;
+      }
+    } else {
+      jobData = req.body;
     }
 
     const job = await Job.findByIdAndUpdate(
@@ -229,11 +299,21 @@ router.put('/:id', [auth, isAdmin, upload.single('logo')], async (req, res) => {
 
     res.json(job);
   } catch (err) {
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
+    // Delete uploaded files if update failed
+    if (req.files) {
+      Object.values(req.files).forEach(fileArray => {
+        fileArray.forEach(file => {
+          try {
+            fs.unlinkSync(file.path);
+          } catch (unlinkErr) {
+            console.error('Error deleting file:', unlinkErr);
+          }
+        });
+      });
     }
-    console.error(err.message);
-    res.status(500).send('Server error');
+    
+    console.error('Update job error:', err.message, err.stack);
+    res.status(500).json({ message: 'Server error updating job', error: err.message });
   }
 });
 

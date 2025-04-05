@@ -55,6 +55,10 @@ const jobSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
+  },
+  imageUrl: {
+    type: String,
+    default: null  // URL to the job's demo image
   }
 });
 

@@ -12,6 +12,34 @@ const settingsSchema = new mongoose.Schema({
   updatedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
+  },
+  stripeSettings: {
+    secretKey: {
+      type: String,
+      default: ''
+    },
+    publishableKey: {
+      type: String,
+      default: ''
+    },
+    webhookSecret: {
+      type: String,
+      default: ''
+    },
+    prices: {
+      monthly: {
+        type: String,
+        default: ''
+      },
+      quarterly: {
+        type: String,
+        default: ''
+      },
+      yearly: {
+        type: String,
+        default: ''
+      }
+    }
   }
 });
 

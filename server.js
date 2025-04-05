@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
 
 dotenv.config();
 const app = express();
@@ -31,16 +32,21 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
+// Webhook route must come BEFORE other routes
+app.use('/api/subscriptions/webhook', express.raw({type: 'application/json'}));
+
 // Routes
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/jobs', require('./routes/jobRoutes'));
+app.use('/api/subscriptions', subscriptionRoutes);
 
 // Add this before the static middleware
 app.use((req, res, next) => {
@@ -64,7 +70,7 @@ if (!fs.existsSync(uploadDir)){
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const PORT = process.env.PORT || 5004;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 }); 

@@ -1,0 +1,31 @@
+const handleSubscriptionPayment = async (clientSecret) => {
+  try {
+    // Confirm the payment with Stripe
+    const result = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: elements.getElement('card'),
+        billing_details: {
+          email: userEmail
+        }
+      }
+    });
+
+    if (result.error) {
+      // Handle payment error
+      console.error('Payment failed:', result.error);
+    } else {
+      // Payment successful!
+      // The subscription status will automatically update to "active"
+      // Now you can check the status again
+      const response = await fetch('/api/subscriptions/status', {
+        headers: {
+          'x-auth-token': 'your-auth-token'
+        }
+      });
+      const status = await response.json();
+      // Now hasSubscription should be true
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}; 
